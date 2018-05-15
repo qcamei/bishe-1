@@ -20,7 +20,8 @@
           scroll: 0,
           span1: false,
           span2: false,
-          span3: false
+          span3: false,
+          resizeTime: null
         }
       },
       methods: {
@@ -45,8 +46,6 @@
         //   // console.log('scroll')
         // }, 200)
         window.addEventListener('scroll', this.scrollMove)
-        // _this.scroll = document.documentElement.scrollTop || document.body.scrollTop
-        // console.log(document.body.scrollTop, _this.scroll, document.documentElement.scrollTop)
       },
       destroyed () {
         window.removeEventListener('scroll', this.scrollMove)

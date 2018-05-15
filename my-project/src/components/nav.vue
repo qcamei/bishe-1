@@ -2,28 +2,29 @@
   <nav>
     <div class="nav">
       <ul>
-        <li><router-link to="/" tag="li">logo</router-link></li>
-        <li><router-link to="/" tag="li" exact-active-class="nav-click">首页</router-link></li>
-        <li><router-link to="/message" tag="li" exact-active-class="nav-click">攻略</router-link></li>
-        <li><router-link to="/map" tag="li" exact-active-class="nav-click">景点</router-link></li>
-        <li><router-link to="/share" tag="li" exact-active-class="nav-click">分享</router-link></li>
+        <router-link to="/" tag="li">logo</router-link></li>
+        <router-link to="/" tag="li" exact-active-class="nav-click">首页</router-link></li>
+        <router-link to="/article" tag="li" exact-active-class="nav-click">攻略</router-link></li>
+        <router-link to="/attraction" tag="li" exact-active-class="nav-click">景点</router-link></li>
+        <router-link to="/user" tag="li" exact-active-class="nav-click">分享</router-link></li>
       </ul>
       <div class="box-login">
-        <form name="search">
-          <input type="text" :placeholder="holder" id="search" v-model="city"
-                 autocomplete="off" @focus="searchFocus = true" @blur="sFocus">
-          <button type="button" @click="search" >查找</button>
-          <div class="search-city" v-show="searchFocus">
-            <span v-for="list in cityList" @click="choiceCity(list)">{{list}}</span>
+        <div class="search" >
+          <input type="text" :placeholder="holder" id="search" v-model="city" autocomplete="off"
+                 @focus="cityListFocus = true"  @blur="sFocus" @keydown="keyspan" v-focus="cityStatus == -1">
+          <button type="button" @click="searchClick" >查找</button>
+          <div class="search-city" v-show="cityListFocus">
+            <span v-for="(list,index) in cityList" @click="choiceCity(list)" v-focus="cityStatus == index"
+                  :class="{'search-focus': cityStatus == index}">{{list.attraction + ' ' + list.city}}</span>
           </div>
-        </form>
+        </div>
         <ul class="nav-login" v-if="username == null||username == ''">
           <li><a @click="click_login">登录</a></li>
-          <li style="width: 50px;"><a href="register.html" target="_blank">注册</a></li>
+          <li style="width: 50px;"><a href="register.html#/1" target="_blank">注册</a></li>
         </ul>
         <ul class="nav-login welcome" v-else>
-          <li style="width: 90px;" v-if="username.length>6"><span>欢迎</span>{{ username.substr(0,3) + '..' }}</li>
-          <li style="width: 90px;" v-else><span>欢迎</span>{{ username }}</li>
+          <router-link style="width: 90px;" v-show="username.length>6" to="/user" ><span>欢迎</span>{{ username.substr(0,3) + '..' }}</router-link>
+          <router-link style="width: 90px;" v-show="username.length<=6" to="/user"><span>欢迎</span>{{ username }}</router-link>
           <li @click="outlog">退出</li>
         </ul>
       </div>
@@ -32,44 +33,99 @@
 </template>
 
 <script>
+import _ from 'lodash.debounce'
 export default {
   name: 'travelNav',
+  props: ['username', 'searchType'],
   data () {
     return {
-      holder: '搜索地区景点、用户',
+      holder: '搜索地区景点、攻略',
       city: '',
-      searchFocus: false,
-      cityList: ['北京', '上海', '广州', '天津']
+      cityListFocus: false,
+      cityStatus: -1,
+      cityList: [],
+      searchTypeList: true
     }
   },
-  props: ['username'],
+  watch: {
+    city: function () {
+      this.getCityList()
+      this.cityListFocus = true
+    }
+  },
   methods: {
+    getCityList: _(
+      function () {
+        var city = this.city
+        if (city === '') {
+          return
+        }
+        this.$http.get('/api/attraction/selectCity', {
+          params: {
+            city: city
+          }
+        }).then((res) => {
+          if (res.data === -1) {
+            this.cityList = []
+          } else {
+            this.cityList = res.data
+            this.cityListFocus = true
+            console.log(this.cityList)
+          }
+        })
+      }, 500, {'MAXWAIT': 1000}),
+    keyspan: function (e) {
+      var length = this.cityList.length
+      if (e.keyCode === 38) { // up
+        if (this.cityStatus === 0) {
+          this.cityStatus = -1
+        } else if (this.cityStatus === -1) {
+          this.cityStatus = length - 1
+        } else {
+          this.cityStatus = (this.cityStatus + length - 1) % length
+        }
+      } else if (e.keyCode === 40) { // down
+        this.cityStatus = (this.cityStatus + 1) % length
+      } else if (e.keyCode === 13) { // enter
+        if (this.cityStatus === -1) {
+          console.log('search')
+          if (this.city === '') {
+            this.toAttraction({attraction: '', city: ''})
+          } else {
+            console.log('enter' + this.city)
+            this.$router.push({path: '/city/' + this.city})
+          }
+
+        } else {
+          this.toAttraction(this.cityList[this.cityStatus])
+        }
+        // this.cityStatus = -1
+      }
+      // this.city = this.cityList[this.cityStatus].attraction
+      // console.log(this.cityList[this.cityStatus])
+    },
+    toAttraction: function (value) {
+      this.$router.push({path: '/attraction/' + value.attraction})
+      this.$emit('send-city', value)
+    },
     sFocus: function () {
       let _this = this
       setTimeout(function () {
-        _this.searchFocus = false
+        _this.cityListFocus = false
+        _this.cityStatus = -2
       }, 100)
     },
     choiceCity: function (city) {
-      this.city = city
-      console.log('click')
-    },
-    search: function () {
-      var city = this.city
       console.log(city)
+      this.toAttraction(city)
+    },
+    searchClick: function () {
+      var city = this.city
       if (city === '') {
-        console.log('city null')
-        return
+        alert('请输入查找内容')
+      } else {
+        this.$router.push({path: '/city/' + city})
       }
-      this.$http.get('/api/attraction/selectCity', {
-        params: {
-          city: city
-        }
-      }).then((res) => {
-        console.log(res)
-      }, (error) => {
-        console.log(error)
-      })
     },
     click_login: function () {
       this.$emit('click-login')
@@ -81,6 +137,15 @@ export default {
         sessionStorage.removeItem('username')
         console.log('out ' + sessionStorage.getItem('username'))
         this.$emit('outlog', this.username)
+      }
+    }
+  },
+  directives: {
+    focus: {
+      update: function (el, {value}) {
+        if (value) {
+          el.focus()
+        }
       }
     }
   }
@@ -96,10 +161,16 @@ nav{
   font-size:18px;
   min-width: 930px;
   background: #fff;
-  border-bottom:1px solid #bfbfbf ;
+  border-bottom: #d6d6d6 1px solid;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.12)
+}
+.search-focus{
+  background-color: #71caa2;
+  color: #fff;
 }
 .nav-click{
   background: #71caa2;
+  box-shadow: 0 2px 5px #88d0af;
   color: #fff;
 }
 .nav{
@@ -122,6 +193,7 @@ ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  z-index: 10;
 }
 li {
   line-height: 54px;
@@ -130,10 +202,17 @@ li {
   color: #000;
   display: inline-block;
 }
-form{
+.search{
   display: inline-block;
   margin-right: 5px ;
   top: 1px;
+}
+.search-type{
+  position: absolute;
+  font-size: 15px;
+}
+.search-type span{
+  position: absolute;
 }
 input{
   height: 27px;
@@ -152,14 +231,13 @@ input{
   border-top: none;
   width: 208px;
   background-color: white;
+  color: #71caa2;
 }
 .search-city span{
   display: block;
   padding: 7px 10px;
-  width: 90%;
   line-height: 15px;
   font-size: 15px;
-  color: #71caa2;
 }
 button{
   border: 1px solid #bfbfbf;

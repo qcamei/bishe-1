@@ -13,13 +13,20 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^1.0.0-beta.1",
+    "@ckeditor/ckeditor5-upload": "^1.0.0-beta.2",
     "axios": "^0.17.1",
     "body-parser": "^1.18.2",
     "connect": "^3.6.5",
     "connect-history-api-fallback": "^1.5.0",
     "express": "^4.16.2",
+    "express-formidable": "^1.0.0",
+    "formidable": "^1.2.1",
+    "lodash": "^4.17.5",
+    "lodash.debounce": "^4.0.8",
     "mysql": "^2.15.0",
     "swiper": "^4.1.6",
+    "thenjs": "^2.0.6",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },

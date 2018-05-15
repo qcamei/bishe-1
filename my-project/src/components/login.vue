@@ -1,16 +1,19 @@
 <template>
-  <div class="back">
+  <div class="login-box">
+    <div class="login-background"></div>
     <div class="login">
       <div class="login-title">
         <ul>
           <li>登录</li>
-          <li><a style="color: #42b983;" href="register.html" target="_blank">注册</a></li>
+          <li><a style="color: #42b983;" href="register.html#/1" target="_blank">注册</a></li>
         </ul>
       </div>
       <form>
         <input type="text" name="username" :placeholder="userHolder" v-model="username"> <br>
-        <input type="password" name="password" autocomplete="off" :placeholder="passwordHolder" v-model="password"> <br>
-        <a class="submitUser" href="javascript:;" @click="submitUser(true)">提交</a>
+        <input type="password" name="password" autocomplete="off" :placeholder="passwordHolder"
+               v-model="password" style="margin-bottom: 5px;"> <br>
+        <a class="modify" href="register.html#/0">修改密码</a><br/>
+        <a class="submitUser" href="javascript:;" @click="submitUser(true)" style="margin-top: 10px;">提交</a>
         <a class="submitUser" href="javascript:;" style="background-color: #fa6060" @click="submitUser(false)">取消</a>
       </form>
     </div>
@@ -22,8 +25,8 @@
     name: 'LogIn',
     data () {
       return {
-        username: '',
-        password: '',
+        username: 'asd',
+        password: '123qwe',
         userHolder: '请输入账户',
         passwordHolder: '请输入密码'
       }
@@ -54,6 +57,9 @@
           this.$emit('have-login')
         }
       }
+    },
+    mounted () {
+      console.log('login.vue')
     }
   }
 </script>
@@ -74,12 +80,19 @@
     color: #fff;
     text-decoration: none;
   }
+  .modify{
+    line-height: 15px;
+    color: #41b883;
+    margin-left: 120px;
+    font-size: 12px;
+  }
   .submitUser{
     display: inline-block;
     line-height: 29px;
     width: 174px;
     height: 29px;
-    background-color: #42b983;
+    background-color: #41b883;
+    opacity: 0.8;
     border-radius: 3px;
     margin-bottom: 7px ;
   }
@@ -96,8 +109,14 @@
     border-radius: 5px;
     text-align: center;
   }
-  .back{
-    z-index: 1;
+  .login-box{
+    z-index: 15;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+  }
+  .login-background{
     position: absolute;
     background: #000;
     opacity:0.7;

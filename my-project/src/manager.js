@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import App from './App'
-import router from './router/index'
+import manager from './manager.vue'
+import router from './router/manager'
 import axios from 'axios'
 
 Vue.prototype.$http = axios
@@ -8,8 +8,8 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#manager',
   router,
-  template: '<App/>',
-  components: { App }
+  template: '<manager/>',
+  components: { manager }
 })

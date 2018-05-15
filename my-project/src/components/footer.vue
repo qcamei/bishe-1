@@ -1,5 +1,5 @@
 <template>
-    <footer>
+    <footer id="foot">
     </footer>
 </template>
 
@@ -13,7 +13,7 @@
 footer{
   position: absolute;
   display: block;
-  bottom: -34px;
+  bottom: -100px;
   width: 100%;
   height: 100px;
   background: #242922;

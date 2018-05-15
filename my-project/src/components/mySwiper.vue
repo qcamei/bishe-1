@@ -16,7 +16,7 @@
 <script>
     import Swiper from 'swiper'
     import '../assets/swiper.min.css'
-    import b from '../assets/swiper-1.jpg'
+    // import b from '../assets/swiper-1.jpg'
     import a from '../assets/swiper-2.jpg'
     import c from '../assets/swiper-3.jpg'
     import d from '../assets/swiper-4.jpg'
@@ -50,7 +50,7 @@
           autoplay: {
             delay: 4000,
             stopOnLastSlide: false,
-            disableOnInteraction: true,
+            disableOnInteraction: true
           },
           speed: 600,
           lazy: true
